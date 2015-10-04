@@ -1,0 +1,16 @@
+webhookmq:
+    build: .
+    environment:
+        - DEBUG=True
+        - SECRET_KEY=supersecretkey
+        - MQ_URI=amqp://guest:guest@rabbitmq//
+        - PATH_PREFIX=test
+    ports:
+        - "80:8080"
+    volumes:
+        - ".:/usr/src/app"
+    links:
+        - rabbitmq
+
+rabbitmq:
+    image: rabbitmq
