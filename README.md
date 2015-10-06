@@ -1,4 +1,5 @@
-# Receive webhooks and put them into a message queue
+# WebhookMQ
+Receive webhooks and put them into a message queue
 Built in python using Django for web requests and kombu for message queue handling.
 
 ## Message queues supported

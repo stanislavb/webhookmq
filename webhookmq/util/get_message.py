@@ -9,10 +9,11 @@ def get_message(mq_uri, queue):
         try:
             message = simple_queue.get(block=True, timeout=1)
             message.ack()
+            payload = message.payload
         except simple_queue.Empty:
-            message = None
+            payload = None
         simple_queue.close()
-        return message
+        return payload
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -22,6 +23,6 @@ if __name__ == "__main__":
 
     message = get_message(args.mq, args.queue)
     if message:
-        print("Received: %s" % message.payload)
+        print("Received: %s" % message)
     else:
         print("Queue empty")
