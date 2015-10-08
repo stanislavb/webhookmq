@@ -29,10 +29,15 @@ def queue_message(message, queue):
 def receive_message(request, path_prefix, queue):
     if path_prefix != settings.PATH_PREFIX:
         return HttpResponseNotFound()
-    decoded_message = request.body.decode('utf-8')
-    print(decoded_message)
-    message = json.loads(decoded_message)
+    try:
+        decoded_message = request.body.decode('utf-8')
+        message = json.loads(decoded_message)
+    except json.decoder.JSONDecodeError:
+        # We have invalid JSON. Let's try Django's QueryDict.
+        message = request.POST
     logger.info('Received message: {}'.format(message))
+    if len(message) == 0:
+        return JsonResponse({"message": "Empty POST request"}, status=400)
     queued = queue_message(message, queue)
     if queued:
         return JsonResponse(message, status=200)
