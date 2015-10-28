@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>WebhookMQ by stanislavb</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>WebhookMQ</h1>
+        <h2>Receive webhooks and put them into a message queue</h2>
+        <a href="https://github.com/stanislavb/webhookmq" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="webhookmq" class="anchor" href="#webhookmq" aria-hidden="true"><span class="octicon octicon-link"></span></a>WebhookMQ</h1>
+
+<p>Receive webhooks and put them into a message queue.</p>
+
+<p>Built in python using Django for web requests and kombu for message queue handling.</p>
+
+<h2>
+<a id="message-queues-supported" class="anchor" href="#message-queues-supported" aria-hidden="true"><span class="octicon octicon-link"></span></a>Message queues supported</h2>
+
+<p>The kombu library supports amqp, qpid, redis, mongodb and more: <a href="http://kombu.readthedocs.org/en/latest/userguide/connections.html">http://kombu.readthedocs.org/en/latest/userguide/connections.html</a></p>
+
+<h2>
+<a id="webhooks-supported" class="anchor" href="#webhooks-supported" aria-hidden="true"><span class="octicon octicon-link"></span></a>Webhooks supported</h2>
+
+<p>Note that this app has no security. Any POST request to an endpoint using the right path prefix will result in an attempt to put a message on a queue, as long as request contents can be decoded as JSON or a key-value multipart/form-data.</p>
+
+<p>The way to avoid abuse is to restrict access to this app in a firewall and validate message contents when consuming them from the queue.</p>
+
+<pre><code>http(s)://hostname.example.com/path/queue_name
+</code></pre>
+
+<p>On a successful request, HTTP 200 OK is returned. On some errors, content returned will be a JSON structure with a 'message' key.</p>
+
+<h2>
+<a id="build" class="anchor" href="#build" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build</h2>
+
+<p>Either pull an image automatically built from this repo (<a href="https://hub.docker.com/r/stanislavb/webhookmq/">https://hub.docker.com/r/stanislavb/webhookmq/</a>):</p>
+
+<pre><code>docker pull stanislavb/webhookmq
+</code></pre>
+
+<p>Or build your own:</p>
+
+<pre><code>make build
+</code></pre>
+
+<h2>
+<a id="test" class="anchor" href="#test" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test</h2>
+
+<p>Test code standards (requires flake8 installed):</p>
+
+<pre><code>make syntax-test
+</code></pre>
+
+<p>Test integration with RabbitMQ:</p>
+
+<pre><code>make clean &amp;&amp; make test
+</code></pre>
+
+<h2>
+<a id="deploy" class="anchor" href="#deploy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deploy</h2>
+
+<p>Hosting of a message queue is not covered by this document, but if you have one provisioned, you can scale WebhookMQ horisontally just by starting more with same settings.</p>
+
+<pre><code>docker run -d \
+    -e "SECRET_KEY=foo" \
+    -e "PATH_PREFIX=webhook" \
+    -e "MQ_URI=amqp://user:password@mq.example.com/vhost/" \
+    stanislavb/webhookmq
+</code></pre>
+
+<p>The command above would start the service and accept POST requests at http://(container ip):8080/webhook/(queue_name)/</p>
+
+<h3>
+<a id="use-nginx-proxy" class="anchor" href="#use-nginx-proxy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Use nginx proxy</h3>
+
+<p>It is extremely recommended to use a robust web server in front of any web application. You could for example use jwilder/nginx-proxy:</p>
+
+<pre><code>docker run -d \
+    --name nginx-proxy \
+    -v /var/run/docker.sock:/tmp/docker.sock:ro \
+    -p 80:80 \
+    jwilder/nginx-proxy
+
+docker run -d \
+    -e "SECRET_KEY=foo" \
+    -e "PATH_PREFIX=webhook" \
+    -e "MQ_URI=amqp://user:password@mq.example.com/vhost/" \
+    -e "VIRTUAL_HOST=public.example.com" \
+    stanislavb/webhookmq
+</code></pre>
+
+<p>Provided DNS record for public.example.com would be pointing at this docker host machine, the service would accept POST requests at <a href="http://public.example.com/webhook/(queue_name)/">http://public.example.com/webhook/(queue_name)/</a></p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/stanislavb/webhookmq/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/stanislavb/webhookmq/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/stanislavb/webhookmq"></a> is maintained by <a href="https://github.com/stanislavb">stanislavb</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
