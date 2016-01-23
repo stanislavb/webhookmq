@@ -1,26 +1,27 @@
-.PHONY: test-syntax test-integration build rmi compose rabbitmq-test docker-test-integration test clean
+.PHONY: test-syntax test-integration build rmi compose docker-test-integration
+
+# Test code syntax and standards
 test-syntax:
 	flake8 --verbose --max-line-length=120 --exclude=".git,env" --show-source .
+
+# Run Django tests. Sleep timer is to let RabbitMQ start being reachable.
 test-integration:
-	python -m webhookmq.queue test
+	sleep 3 && python -m webhookmq.queue test webhookmq.test
+
+# Build docker image
 build:
-	docker build --force-rm -t stanislavb/$(shell basename $(CURDIR)) .
+	docker build --force-rm -t stanislavb/webhookmq .
+
+# Remove docker image
 rmi:
-	docker rmi stanislavb/$(shell basename $(CURDIR))
+	docker rmi stanislavb/webhookmq
+
+# Build and run WebhookMQ with RabbitMQ backend
 compose:
 	docker-compose build
 	docker-compose up -d
-rabbitmq-test:
-	docker run -d --hostname $(shell basename $(CURDIR))_rabbitmq \
-		--name $(shell basename $(CURDIR))_rabbitmq_test rabbitmq
-	sleep 3
+
+# Run integration test in a docker container linked to rabbitmq backend
 docker-test-integration:
-	docker run -it --name $(shell basename $(CURDIR))_integration_test \
-		-e "SECRET_KEY=test" -e "PATH_PREFIX=test" -e "DEBUG=True" \
-		--link $(shell basename $(CURDIR))_rabbitmq_test:rabbitmq \
-		stanislavb/$(shell basename $(CURDIR)) \
-		make test-integration
-test: build rabbitmq-test docker-test-integration
-clean:
-	docker rm -f $(shell basename $(CURDIR))_rabbitmq_test
-	docker rm -f $(shell basename $(CURDIR))_integration_test
+	docker-compose build
+	docker-compose run webhookmq make test-integration

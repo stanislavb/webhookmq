@@ -1,0 +1,16 @@
+machine:
+  python:
+    version: 3.5.0
+  services:
+    - docker
+
+dependencies:
+  override:
+    - pip install -r requirements-test.txt
+    - docker info
+    - docker --version
+
+test:
+  override:
+    - make test-syntax
+    - make docker-test-integration
