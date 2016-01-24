@@ -1,4 +1,6 @@
 # WebhookMQ
+![Build status](https://circleci.com/gh/stanislavb/webhookmq.svg?style=shield&circle-token=a6876dda60739f563d1c8e71fa3ffbb4a1aa723a)
+
 Receive webhooks and put them into a message queue.
 
 Built in python using Django for web requests and kombu for message queue handling.
@@ -31,7 +33,7 @@ Test code standards (requires flake8 installed):
 
 Test integration with RabbitMQ:
 
-    make clean && make test
+    make docker-integration-test
 
 ## Deploy
 Hosting of a message queue is not covered by this document, but if you have one provisioned, you can scale WebhookMQ horisontally just by starting more with same settings.
