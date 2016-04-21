@@ -35,6 +35,14 @@ Test integration with RabbitMQ:
 
     make docker-integration-test
 
+Bring the service up locally and try POSTing to it.
+
+    docker-compose up -d
+    # If running Linux:
+    curl --data "param1=value1&param2=value2" http://localhost/test/foo
+    # If running OSX with docker-machine:
+    curl --data "param1=value1&param2=value2" http://$(docker-machine ip $DOCKER_MACHINE_NAME)/test/foo
+
 ## Deploy
 Hosting of a message queue is not covered by this document, but if you have one provisioned, you can scale WebhookMQ horisontally just by starting more with same settings.
 
