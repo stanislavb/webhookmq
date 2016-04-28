@@ -1,0 +1,19 @@
+webhookmq:
+    build:
+        image: stanislavb/webhookmq
+        dockerfile_path: Dockerfile
+    environment:
+        - DEBUG=True
+        - SECRET_KEY=supersecretkey
+        - MQ_URI=amqp://guest:guest@rabbitmq//
+        - PATH_PREFIX=test
+    links:
+        - rabbitmq
+
+rabbitmq:
+    image: rabbitmq
+
+webhookmq_test:
+    build:
+        image: stanislavb/webhookmq-test
+        dockerfile_path: Dockerfile.test

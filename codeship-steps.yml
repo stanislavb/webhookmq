@@ -1,0 +1,21 @@
+# https://codeship.com/documentation/docker/steps/
+
+- name: integration_test
+  service: webhookmq
+  command: bash -c 'sleep 3 && python -m webhookmq.queue test webhookmq.test'
+
+# webhookmq_test is built on top of container built by webhookmq so it should not be first
+- name: syntax_test
+  service: webhookmq_test
+  command: flake8 --verbose --max-line-length=120 --exclude=".git,env" --show-source .
+
+# push to docker hub
+- name: push_to_docker_hub
+  # only execute in master branch
+  tag: ^(master|staging)
+  service: webhookmq
+  type: push
+  image_name: stanislavb/webhookmq-codeship
+  image_tag: "{{.CommitDescription}}"
+  registry: https://index.docker.io/v1/
+  #encrypted_dockercfg_path: dockercfg.encrypted

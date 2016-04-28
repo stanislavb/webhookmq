@@ -1,0 +1,2 @@
+FROM stanislavb/webhookmq
+RUN pip install -r requirements-test.txt
